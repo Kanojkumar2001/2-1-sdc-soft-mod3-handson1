@@ -1,0 +1,9 @@
+python -m venv .venv
+
+.venv\Scripts\activate
+
+python scripts/train_cnn.py                           
+
+python scripts/train_hybrid.py                           
+
+.venv\Scripts\python.exe -m streamlit run app.py 

@@ -1,0 +1,23 @@
+# Python environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Generated training output
+models/model_checkpoints/
+models/saved_models/
+training_history.png
+*.h5
+*.keras
+*.pth
+
+# Local app and notebook state
+.streamlit/
+.ipynb_checkpoints/
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/

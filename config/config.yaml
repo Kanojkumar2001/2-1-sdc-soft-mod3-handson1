@@ -1,0 +1,24 @@
+data:
+  train_path: "data/train"
+  val_path: "data/validation"
+  test_path: "data/test"
+  image_size: [224, 224]
+  batch_size: 32
+  num_classes: 3
+
+model:
+  architecture: "CNN"  # CNN, ResNet, Hybrid
+  learning_rate: 0.001
+  epochs: 50
+  optimizer: "adam"  # adam, sgd, rmsprop
+
+ml:
+  enable_hybrid: true
+  classifier: "svm"  # svm, random_forest, logistic_regression
+  feature_extraction: "cnn_features"
+
+training:
+  early_stopping: true
+  patience: 10
+  save_best: true
+  checkpoint_dir: "models/model_checkpoints"
