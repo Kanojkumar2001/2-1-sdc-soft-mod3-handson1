@@ -13,8 +13,11 @@ Clone the repository and open a terminal in the project folder:
 ```bash
 git clone https://github.com/Kanojkumar2001/2-1-sdc-soft-mod3-handson1.git
 cd 2-1-sdc-soft-mod3-handson1
+python --version
 python -m venv .venv
 ```
+
+Use Python 3.10. If `python --version` is not 3.10.x, install Python 3.10 and create the environment with `py -3.10 -m venv .venv` on Windows.
 
 Activate the virtual environment.
 
@@ -70,23 +73,3 @@ python main.py --mode predict --image data/test/00_001.png --model hybrid
 ```
 
 All application, configuration, and model paths are resolved from the project directory, so the commands also work when launched from another current directory.
-
-## Run with Docker
-
-Install Docker Desktop on the laptop, then open a terminal in the cloned project folder. Docker Desktop works on Windows, macOS, and Linux and provides the same Python environment on each device.
-
-Build the image:
-
-```bash
-docker build -t image-classifier .
-```
-
-Start the application:
-
-```bash
-docker run --rm -p 8501:8501 image-classifier
-```
-
-Open `http://localhost:8501` in a browser. Stop the application with `Ctrl+C`.
-
-On ARM-based laptops, Docker may use amd64 emulation because the pinned TensorFlow version is packaged for amd64. Docker Desktop must have virtualization enabled.

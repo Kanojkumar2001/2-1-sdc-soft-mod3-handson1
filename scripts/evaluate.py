@@ -1,6 +1,8 @@
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 
 import yaml
 import argparse
@@ -12,8 +14,12 @@ from src.evaluator import ModelEvaluator
 from ml_integration.hybrid_model import HybridModel
 from src.utils import Utils
 
+def resolve_project_path(path):
+    return path if os.path.isabs(path) else os.path.join(PROJECT_ROOT, path)
+
 def evaluate_cnn_tensorflow(config_path='config/config.yaml'):
     """Evaluate TensorFlow CNN model"""
+    config_path = resolve_project_path(config_path)
     # Load configuration
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
@@ -49,6 +55,7 @@ def evaluate_cnn_tensorflow(config_path='config/config.yaml'):
 
 def evaluate_cnn_pytorch(config_path='config/config.yaml'):
     """Evaluate PyTorch CNN model"""
+    config_path = resolve_project_path(config_path)
     # Load configuration
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
@@ -82,6 +89,7 @@ def evaluate_cnn_pytorch(config_path='config/config.yaml'):
 
 def evaluate_hybrid(config_path='config/config.yaml'):
     """Evaluate hybrid model"""
+    config_path = resolve_project_path(config_path)
     # Load configuration
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
@@ -92,7 +100,7 @@ def evaluate_hybrid(config_path='config/config.yaml'):
     
     # Load hybrid model
     hybrid_model = HybridModel(config)
-    model_path = 'models/hybrid_model'
+    model_path = os.path.join(PROJECT_ROOT, 'models', 'hybrid_model')
     
     if os.path.exists(model_path):
         hybrid_model.load_model(model_path)
@@ -119,7 +127,7 @@ def evaluate_all_models(config_path='config/config.yaml'):
     print("=" * 60)
     
     # Create evaluation results directory
-    os.makedirs('evaluation_results', exist_ok=True)
+    os.makedirs(os.path.join(PROJECT_ROOT, 'evaluation_results'), exist_ok=True)
     
     # Evaluate each model
     results = {}
@@ -156,6 +164,7 @@ def evaluate_all_models(config_path='config/config.yaml'):
     print("\nAll evaluation results saved to 'evaluation_results' directory")
 
 def main():
+    os.chdir(PROJECT_ROOT)
     parser = argparse.ArgumentParser(description='Evaluate Image Classification Models')
     parser.add_argument('--model', type=str, choices=['tensorflow', 'pytorch', 'hybrid', 'all'],
                        default='all', help='Model type to evaluate')
