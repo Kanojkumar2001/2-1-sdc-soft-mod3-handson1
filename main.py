@@ -2,18 +2,22 @@ import sys
 import os
 import yaml
 import argparse
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent
 
 def setup_directories():
     """Create necessary directories"""
     directories = [
-        'data/train', 'data/validation', 'data/test',
-        'models/saved_models', 'models/model_checkpoints',
-        'notebooks'
+        PROJECT_ROOT / 'data/train', PROJECT_ROOT / 'data/validation', PROJECT_ROOT / 'data/test',
+        PROJECT_ROOT / 'models/saved_models', PROJECT_ROOT / 'models/model_checkpoints',
+        PROJECT_ROOT / 'notebooks'
     ]
     for dir_path in directories:
-        os.makedirs(dir_path, exist_ok=True)
+        dir_path.mkdir(parents=True, exist_ok=True)
 
 def main():
+    os.chdir(PROJECT_ROOT)
     parser = argparse.ArgumentParser(description='Image Classification Project')
     parser.add_argument('--mode', choices=['train_cnn', 'train_hybrid', 'predict'],
                        default='train_cnn', help='Mode to run')

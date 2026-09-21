@@ -1,9 +1,72 @@
+# Image Classification Project
+
+## Requirements
+
+- Windows, macOS, or Linux
+- Python 3.10 (the pinned TensorFlow version does not support every newer Python version)
+- Git
+
+## Setup on another laptop
+
+Clone the repository and open a terminal in the project folder:
+
+```bash
+git clone https://github.com/Kanojkumar2001/2-1-sdc-soft-mod3-handson1.git
+cd 2-1-sdc-soft-mod3-handson1
 python -m venv .venv
+```
 
-.venv\Scripts\activate
+Activate the virtual environment.
 
-python scripts/train_cnn.py                           
+Windows PowerShell:
 
-python scripts/train_hybrid.py                           
+```powershell
+.venv\Scripts\Activate.ps1
+```
 
-.venv\Scripts\python.exe -m streamlit run app.py 
+Windows Command Prompt:
+
+```bat
+.venv\Scripts\activate.bat
+```
+
+macOS/Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+Install dependencies:
+
+```bash
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+## Run the application
+
+```bash
+python -m streamlit run app.py
+```
+
+Then open the URL printed by Streamlit, normally `http://localhost:8501`.
+
+The image quality analysis works without a trained CNN checkpoint. To enable CNN training and prediction, run:
+
+```bash
+python scripts/train_cnn.py
+```
+
+To train the hybrid model:
+
+```bash
+python scripts/train_hybrid.py
+```
+
+The command-line entry point is also available:
+
+```bash
+python main.py --mode predict --image data/test/00_001.png --model hybrid
+```
+
+All application, configuration, and model paths are resolved from the project directory, so the commands also work when launched from another current directory.

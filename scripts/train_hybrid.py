@@ -2,12 +2,15 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 import yaml
 import joblib
 from src.data_loader import DataLoader
 from ml_integration.hybrid_model import HybridModel
 
 def main():
+    os.chdir(PROJECT_ROOT)
     # Load configuration
     with open('config/config.yaml', 'r') as f:
         config = yaml.safe_load(f)
