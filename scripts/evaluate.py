@@ -26,7 +26,7 @@ def evaluate_cnn_tensorflow(config_path='config/config.yaml'):
     
     # Load test data
     data_loader = DataLoader(config)
-    _, _, test_generator = data_loader.load_data_tensorflow()
+    _, test_generator = data_loader.load_data_tensorflow()
     
     # Load model
     model = create_model(
@@ -96,7 +96,7 @@ def evaluate_hybrid(config_path='config/config.yaml'):
     
     # Load test data
     data_loader = DataLoader(config)
-    _, _, test_generator = data_loader.load_data_tensorflow()
+    _, test_generator = data_loader.load_data_tensorflow()
     
     # Load hybrid model
     hybrid_model = HybridModel(config)

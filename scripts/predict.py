@@ -43,9 +43,13 @@ def predict_hybrid(image_path, model_path):
 
 def main():
     input_path = sys.argv[1] if len(sys.argv) > 1 else os.path.join('data', 'test', 'sample.jpg')
-    image_path = os.path.abspath(input_path)
     os.chdir(PROJECT_ROOT)
+    image_path = input_path if os.path.isabs(input_path) else os.path.join(PROJECT_ROOT, input_path)
+    image_path = os.path.abspath(image_path)
     model_type = sys.argv[2] if len(sys.argv) > 2 else 'hybrid'
+
+    if not os.path.isfile(image_path):
+        raise FileNotFoundError(f"Input image not found: {image_path}")
     
     if model_type == 'cnn':
         class_idx, confidence = predict_cnn(

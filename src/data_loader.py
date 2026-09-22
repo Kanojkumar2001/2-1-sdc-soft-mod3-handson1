@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import numpy as np
 import pandas as pd
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
@@ -25,6 +26,27 @@ class DataLoader:
         self.config = config
         self.image_size = config['data']['image_size']
         self.batch_size = config['data']['batch_size']
+        self.project_root = Path(__file__).resolve().parent.parent
+
+    def _resolve_data_path(self, configured_path):
+        """Resolve config paths independently of the current working directory."""
+        path = Path(configured_path)
+        if not path.is_absolute():
+            path = self.project_root / path
+        return path
+
+    @staticmethod
+    def _has_images(directory):
+        image_extensions = ('.jpg', '.jpeg', '.png', '.bmp', '.gif', '.webp')
+        return any(
+            entry.is_file() and entry.suffix.lower() in image_extensions
+            for entry in directory.iterdir()
+        ) or any(
+            child.is_file() and child.suffix.lower() in image_extensions
+            for class_dir in directory.iterdir()
+            if class_dir.is_dir()
+            for child in class_dir.iterdir()
+        )
         
     def load_data_tensorflow(self):
         """Load data using TensorFlow's ImageDataGenerator"""
@@ -42,35 +64,36 @@ class DataLoader:
         val_datagen = ImageDataGenerator(rescale=1./255)
         
         train_generator = self._create_generator(
-            train_datagen, self.config['data']['train_path'], shuffle=True
+            train_datagen, self._resolve_data_path(self.config['data']['train_path']), shuffle=True
         )
         val_generator = self._create_generator(
-            val_datagen, self.config['data']['val_path'], shuffle=False
+            val_datagen, self._resolve_data_path(self.config['data']['val_path']), shuffle=False,
+            required=False
         )
         
         return train_generator, val_generator
 
-    def _create_generator(self, datagen, directory, shuffle):
+    def _create_generator(self, datagen, directory, shuffle, required=True):
         """Load either class subdirectories or filenames prefixed by a class label."""
         image_extensions = ('.jpg', '.jpeg', '.png', '.bmp', '.gif')
-        if not any(
-            entry.is_file() and entry.name.lower().endswith(image_extensions)
-            for entry in os.scandir(directory)
-        ) and not any(
-            any(
-                child.is_file() and child.name.lower().endswith(image_extensions)
-                for child in os.scandir(class_dir.path)
-            )
-            for class_dir in os.scandir(directory)
-            if class_dir.is_dir()
-        ):
+        directory = Path(directory)
+        if not directory.exists():
+            if required:
+                raise FileNotFoundError(
+                    f"Dataset directory not found: {directory}. "
+                    "Check the paths in config/config.yaml."
+                )
+            return None
+        if not directory.is_dir():
+            raise NotADirectoryError(f"Dataset path is not a directory: {directory}")
+        if not self._has_images(directory):
+            if required:
+                raise ValueError(f"No image files found in dataset directory: {directory}")
             return None
 
         entries = [
-            entry for entry in os.scandir(directory)
-            if entry.is_file() and entry.name.lower().endswith(
-                image_extensions
-            )
+            entry for entry in directory.iterdir()
+            if entry.is_file() and entry.suffix.lower() in image_extensions
         ]
 
         if entries:
@@ -79,7 +102,7 @@ class DataLoader:
                 if '_' not in entry.name:
                     continue
                 label = entry.name.split('_', 1)[0]
-                records.append({'filename': entry.path, 'class': label})
+                records.append({'filename': str(entry), 'class': label})
 
             if not records:
                 raise ValueError(
@@ -122,13 +145,28 @@ class DataLoader:
         # Load images and labels
         images = []
         labels = []
-        class_names = os.listdir(self.config['data']['train_path'])
+        train_path = self._resolve_data_path(self.config['data']['train_path'])
+        if not train_path.exists():
+            raise FileNotFoundError(
+                f"Dataset directory not found: {train_path}. "
+                "Check the paths in config/config.yaml."
+            )
+
+        class_names = sorted(
+            path.name for path in train_path.iterdir()
+            if path.is_dir() and self._has_images(path)
+        )
+        if not class_names:
+            raise ValueError(
+                f"No class folders containing images found in: {train_path}"
+            )
         
         for class_idx, class_name in enumerate(class_names):
-            class_path = os.path.join(self.config['data']['train_path'], class_name)
-            for img_name in os.listdir(class_path):
-                img_path = os.path.join(class_path, img_name)
-                images.append(img_path)
+            class_path = train_path / class_name
+            for image_path in class_path.iterdir():
+                if image_path.suffix.lower() not in ('.jpg', '.jpeg', '.png', '.bmp', '.gif', '.webp'):
+                    continue
+                images.append(str(image_path))
                 labels.append(class_idx)
         
         # Split data

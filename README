@@ -17,7 +17,7 @@ python --version
 python -m venv .venv
 ```
 
-Use Python 3.10. If `python --version` is not 3.10.x, install Python 3.10 and create the environment with `py -3.10 -m venv .venv` on Windows.
+Use Python 3.10.x. If `python --version` is not 3.10.x, install Python 3.10 and create the environment with `py -3.10 -m venv .venv` on Windows. Using a fresh virtual environment is important; it prevents packages from another project from causing import errors.
 
 Activate the virtual environment.
 
@@ -72,4 +72,14 @@ The command-line entry point is also available:
 python main.py --mode predict --image data/test/00_001.png --model hybrid
 ```
 
-All application, configuration, and model paths are resolved from the project directory, so the commands also work when launched from another current directory.
+The commands can be launched from any current directory when you run them from the project folder. Dataset paths in `config/config.yaml` are resolved from the project directory, so they do not depend on a user's laptop-specific absolute path. Keep the dataset in `data/train`, `data/validation`, and `data/test`; TensorFlow datasets may use class folders or files named like `class_image.jpg`.
+
+If TensorFlow reports a dependency import error, recreate the environment and reinstall from `requirements.txt` rather than installing packages into the system Python:
+
+```powershell
+Remove-Item -Recurse -Force .venv
+py -3.10 -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
