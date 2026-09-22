@@ -5,7 +5,6 @@ import numpy as np
 import streamlit as st
 from PIL import Image
 
-
 PROJECT_ROOT = Path(__file__).resolve().parent
 CNN_MODEL_PATH = PROJECT_ROOT / "models" / "saved_models" / "best_model.h5"
 
@@ -33,7 +32,6 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-
 
 def analyze_image(image: Image.Image):
     rgb = np.array(image.convert("RGB"))
@@ -64,7 +62,6 @@ def analyze_image(image: Image.Image):
         "height": rgb.shape[0],
         "channels": "RGB",
     }
-
 
 def predict_flower(image: Image.Image):
     if not CNN_MODEL_PATH.exists():
